@@ -20,8 +20,11 @@
       "node"
     ],
     "paths": {
-      "flash-deals-sdk": [
+      "flaset-sdk": [
         "./src/index.ts"
+      ],
+      "flaset-sdk/deals": [
+        "./src/deals/index.ts"
       ]
     }
   },

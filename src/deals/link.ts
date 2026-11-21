@@ -3,9 +3,9 @@
 // the uint64 fields as numbers; a whitelist travels as each wallet's 20 bytes in base64url. Only the fragment carries the
 // deal, so it never reaches a server.
 import { getAddress, isAddress, type Address, type Hex } from 'viem';
-import { chainOf, isChainId } from './chains.js';
+import { chainOf, isChainId } from '../chains.js';
 import { deploymentOf } from './deployments.js';
-import { FlashDealsError } from './errors.js';
+import { FlasetError } from '../errors.js';
 import { BUYER_MODE, appStartOk, termsProblems, type DealTerms } from './terms.js';
 import { MAX_LIST, whitelistTree } from './whitelist.js';
 
@@ -62,7 +62,7 @@ export function unpackList(s: string | null | undefined): Address[] | null {
 /** the terms as the app's link JSON holds them, in the app's key order */
 function termsJson(t: DealTerms) {
   const n = (v: bigint) => {
-    if (v > BigInt(Number.MAX_SAFE_INTEGER)) throw new FlashDealsError('INVALID_LINK', 'A time field is past the largest number a link holds.');
+    if (v > BigInt(Number.MAX_SAFE_INTEGER)) throw new FlasetError('INVALID_LINK', 'A time field is past the largest number a link holds.');
     return Number(v);
   };
   return {
@@ -90,7 +90,7 @@ function termsJson(t: DealTerms) {
 const KEYS = Object.keys(termsJson({ seller: '0x', buyer: '0x', buyerMode: 0, buyersRoot: '0x', asset: '0x', assetAmount: 0n, payToken: '0x', payAmount: 0n, vestingBps: 0, vestingShape: 0, vestingStart: 0n, vestingCliff: 0n, vestingDuration: 0n, vestingSteps: 0, vestingTransferable: false, maxFee: 0n, deadline: 0n, nonce: 0n }));
 
 const bad = (why: string): never => {
-  throw new FlashDealsError('INVALID_LINK', why);
+  throw new FlasetError('INVALID_LINK', why);
 };
 
 function termsFromJson(raw: unknown): DealTerms {
@@ -128,8 +128,8 @@ function termsFromJson(raw: unknown): DealTerms {
 export function encodeDealLink(deal: SignedDeal, opts: { origin?: string } = {}): string {
   const { chainId, terms, sellerSig, whitelist } = deal;
   const contract = deploymentOf(chainId).FlasetDeals.address;
-  if (!/^0x[0-9a-fA-F]{130}$/.test(sellerSig)) throw new FlashDealsError('INVALID_LINK', 'sellerSig is a 65-byte signature.');
-  if (terms.buyerMode === BUYER_MODE.whitelist && !whitelist) throw new FlashDealsError('INVALID_LINK', 'A whitelist deal travels with its wallets.');
+  if (!/^0x[0-9a-fA-F]{130}$/.test(sellerSig)) throw new FlasetError('INVALID_LINK', 'sellerSig is a 65-byte signature.');
+  if (terms.buyerMode === BUYER_MODE.whitelist && !whitelist) throw new FlasetError('INVALID_LINK', 'A whitelist deal travels with its wallets.');
   const payload = { v: 3, chainId, contract, terms: termsJson(terms), sellerSig };
   const origin = (opts.origin ?? DEFAULT_ORIGIN).replace(/\/+$/, '');
   const list = terms.buyerMode === BUYER_MODE.whitelist && whitelist ? `&l=${packList(whitelist)}` : '';
@@ -138,7 +138,7 @@ export function encodeDealLink(deal: SignedDeal, opts: { origin?: string } = {})
 
 /**
  * The signed deal in a link, read as the Flaset app's buyer page reads it: a whole link, its fragment, or the `d` value
- * alone. Throws a FlashDealsError (code INVALID_LINK) with the app's reason when the app would not open it.
+ * alone. Throws a FlasetError (code INVALID_LINK) with the app's reason when the app would not open it.
  */
 export function decodeDealLink(link: string, opts: { now?: number } = {}): SignedDeal {
   const now = opts.now ?? Math.floor(Date.now() / 1000);

@@ -1,20 +1,20 @@
 {
-  "name": "flash-deals-sdk",
+  "name": "flaset-sdk",
   "version": "1.0.0",
-  "description": "Create, check and buy Flash Deals: a token for a payment in one atomic transaction, on Robinhood Chain, Base, BNB Chain and Ethereum.",
+  "description": "The Flaset SDK: create, check and buy Flash Deals, a token for a payment in one atomic transaction, on Robinhood Chain, Base, BNB Chain and Ethereum.",
   "license": "MIT",
   "author": "Flaset",
   "homepage": "https://flaset.ai",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Flasetai/flash-deals-sdk.git"
+    "url": "git+https://github.com/Flasetai/flaset-sdk.git"
   },
   "keywords": [
-    "flash-deals",
     "flaset",
+    "flash-deals",
+    "sdk",
     "eip-712",
     "viem",
-    "otc",
     "sablier",
     "vesting"
   ],
@@ -32,6 +32,16 @@
       "require": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
+      }
+    },
+    "./deals": {
+      "import": {
+        "types": "./dist/deals/index.d.ts",
+        "default": "./dist/deals/index.js"
+      },
+      "require": {
+        "types": "./dist/deals/index.d.cts",
+        "default": "./dist/deals/index.cjs"
       }
     },
     "./deployments/*.json": "./deployments/*.json",

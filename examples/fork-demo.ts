@@ -1,10 +1,10 @@
 // Create, check and simulate a buy end to end, on a local anvil fork of Robinhood Chain (npm run example; needs Foundry).
 import { parseEther } from 'viem';
-import { checkDeal, createDeal, decodeDealLink, encodeDealLink, prepareBuy, sellerApproval, simulateBuy } from 'flash-deals-sdk';
+import { chains, checkDeal, createDeal, decodeDealLink, encodeDealLink, prepareBuy, sellerApproval, simulateBuy } from 'flaset-sdk/deals';
 import { startFork } from '../test/fork/anvil.js';
 import { USDG, WETH, giveUsdg, wrapEth } from '../test/fork/fund.js';
 
-const fork = await startFork(4663);
+const fork = await startFork(chains.robinhood);
 const [seller, buyer] = fork.accounts as [`0x${string}`, `0x${string}`];
 await wrapEth(fork, seller, parseEther('1'));
 await giveUsdg(fork, buyer, 3_000_000_000n);
@@ -12,10 +12,10 @@ const send = async (from: `0x${string}`, tx: { to: `0x${string}`; data: `0x${str
   fork.client.waitForTransactionReceipt({ hash: await fork.wallet(from).sendTransaction({ account: from, chain: fork.client.chain, ...tx }) });
 
 // 1. The seller creates the deal: 1 WETH for 3,000 USDG, 25% vesting linearly over 90 days
-const deal = createDeal({ chainId: 4663, seller, sell: { token: WETH, amount: parseEther('1') }, price: { token: USDG, amount: 3_000_000_000n }, buyers: { wallet: buyer }, vesting: { percent: 25, shape: 'linear', duration: 90 * 86_400 } });
+const deal = createDeal({ chainId: chains.robinhood, seller, sell: { token: WETH, amount: parseEther('1') }, price: { token: USDG, amount: 3_000_000_000n }, buyers: { wallet: buyer }, vesting: { percent: 25, shape: 'linear', duration: 90 * 86_400 } });
 const sellerSig = await fork.wallet(seller).signTypedData({ account: seller, ...deal.typedData });
-await send(seller, sellerApproval(4663, deal.terms));
-const link = encodeDealLink({ chainId: 4663, terms: deal.terms, sellerSig, whitelist: deal.whitelist });
+await send(seller, sellerApproval(chains.robinhood, deal.terms));
+const link = encodeDealLink({ chainId: chains.robinhood, terms: deal.terms, sellerSig, whitelist: deal.whitelist });
 console.log('link:', link.slice(0, 80) + '…');
 
 // 2. The buyer opens the link and runs the checks

@@ -1,13 +1,6 @@
-export * from './abi.js';
-export * from './buy.js';
+// The Flaset SDK. Each product is one part: `deals` (also `flaset-sdk/deals`) for Flash Deals. The chains and errors are
+// shared; Flash Deals' functions are exported from the root too.
 export * from './chains.js';
-export * from './check.js';
-export * from './create.js';
-export * from './deployments.js';
 export * from './errors.js';
-export * from './link.js';
-export type { LogSearch } from './logs.js';
-export * from './terms.js';
-export * from './tokens.js';
-export * from './vesting.js';
-export * from './whitelist.js';
+export * as deals from './deals/index.js';
+export * from './deals/index.js';

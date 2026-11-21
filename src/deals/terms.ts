@@ -3,7 +3,7 @@
 // signature counts only on that contract on its own chain.
 import { getAddress, hashTypedData, isAddress, type Address, type Hex } from 'viem';
 import { deploymentOf } from './deployments.js';
-import { FlashDealsError } from './errors.js';
+import { FlasetError } from '../errors.js';
 
 export const BUYER_MODE = { oneWallet: 0, whitelist: 1, anyone: 2 } as const;
 export type BuyerMode = (typeof BUYER_MODE)[keyof typeof BUYER_MODE];
@@ -143,7 +143,7 @@ export function termsProblems(t: DealTerms): string[] {
 
 export function assertTerms(t: DealTerms): DealTerms {
   const p = termsProblems(t);
-  if (p.length) throw new FlashDealsError('INVALID_TERMS', p.join(' '));
+  if (p.length) throw new FlasetError('INVALID_TERMS', p.join(' '));
   return t;
 }
 
@@ -160,7 +160,7 @@ export function appStartOk(t: Pick<DealTerms, 'vestingStart' | 'vestingShape' | 
 /** 12:00 UTC on a calendar day, in seconds: the start of a Monthly vesting, as the Flaset app picks it */
 export function monthlyStart(date: Date | string): bigint {
   const d = typeof date === 'string' ? new Date(`${date}T00:00:00Z`) : date;
-  if (Number.isNaN(d.getTime())) throw new FlashDealsError('INVALID_TERMS', 'monthlyStart takes a Date or a YYYY-MM-DD day.');
+  if (Number.isNaN(d.getTime())) throw new FlasetError('INVALID_TERMS', 'monthlyStart takes a Date or a YYYY-MM-DD day.');
   return BigInt(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12) / 1000);
 }
 

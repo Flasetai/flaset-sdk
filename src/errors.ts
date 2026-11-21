@@ -1,4 +1,4 @@
-export type FlashDealsErrorCode =
+export type FlasetErrorCode =
   | 'UNKNOWN_CHAIN'
   | 'INVALID_TERMS'
   | 'INVALID_LINK'
@@ -6,11 +6,16 @@ export type FlashDealsErrorCode =
   | 'NOT_OPEN';
 
 /** Every error this SDK throws on purpose: `code` says which kind, `message` says it in words. */
-export class FlashDealsError extends Error {
-  readonly code: FlashDealsErrorCode;
-  constructor(code: FlashDealsErrorCode, message: string) {
+export class FlasetError extends Error {
+  readonly code: FlasetErrorCode;
+  constructor(code: FlasetErrorCode, message: string) {
     super(message);
-    this.name = 'FlashDealsError';
+    this.name = 'FlasetError';
     this.code = code;
   }
 }
+
+/** The same class under its earlier name */
+export const FlashDealsError = FlasetError;
+export type FlashDealsError = FlasetError;
+export type FlashDealsErrorCode = FlasetErrorCode;

@@ -2,7 +2,7 @@
 // signature) the link the buyer opens and the one transaction the seller sends: the approval of the tokens sold.
 import { encodeFunctionData, erc20Abi, getAddress, type Address, type Hex } from 'viem';
 import { deploymentOf } from './deployments.js';
-import { FlashDealsError } from './errors.js';
+import { FlasetError } from '../errors.js';
 import {
   BUYER_MODE,
   DEFAULT_FEE_BPS,
@@ -63,7 +63,7 @@ export interface CreatedDeal {
 function vestingFields(v: Vesting | undefined): Pick<DealTerms, 'vestingBps' | 'vestingShape' | 'vestingStart' | 'vestingCliff' | 'vestingDuration' | 'vestingSteps' | 'vestingTransferable'> {
   if (!v || v.percent === 0) return { vestingBps: 0, vestingShape: 0, vestingStart: 0n, vestingCliff: 0n, vestingDuration: 0n, vestingSteps: 0, vestingTransferable: false };
   const bps = Math.round(v.percent * 100);
-  if (!(bps > 0 && bps <= 10_000) || Math.abs(bps - v.percent * 100) > 1e-9) throw new FlashDealsError('INVALID_TERMS', 'vesting.percent is from 0.01 to 100, in steps of 0.01.');
+  if (!(bps > 0 && bps <= 10_000) || Math.abs(bps - v.percent * 100) > 1e-9) throw new FlasetError('INVALID_TERMS', 'vesting.percent is from 0.01 to 100, in steps of 0.01.');
   const base = { vestingBps: bps, vestingShape: SHAPE[v.shape], vestingStart: 0n, vestingCliff: 0n, vestingDuration: 0n, vestingSteps: 0, vestingTransferable: v.transferable ?? false };
   switch (v.shape) {
     case 'linear':
@@ -78,7 +78,7 @@ function vestingFields(v: Vesting | undefined): Pick<DealTerms, 'vestingBps' | '
   }
 }
 
-/** Build a deal's terms and the typed data the seller signs. Throws a FlashDealsError for terms FlasetDeals refuses. */
+/** Build a deal's terms and the typed data the seller signs. Throws a FlasetError for terms FlasetDeals refuses. */
 export function createDeal(input: CreateDealInput): CreatedDeal {
   const { chainId } = input;
   deploymentOf(chainId);
@@ -92,8 +92,8 @@ export function createDeal(input: CreateDealInput): CreatedDeal {
     buyerMode = BUYER_MODE.oneWallet;
   } else if (input.buyers !== 'anyone') {
     const tree = whitelistTree(input.buyers.whitelist);
-    if (tree.wallets.length > MAX_LIST) throw new FlashDealsError('INVALID_TERMS', `A whitelist holds at most ${MAX_LIST} wallets.`);
-    if (tree.has(input.seller)) throw new FlashDealsError('INVALID_TERMS', 'The seller cannot be on the whitelist.');
+    if (tree.wallets.length > MAX_LIST) throw new FlasetError('INVALID_TERMS', `A whitelist holds at most ${MAX_LIST} wallets.`);
+    if (tree.has(input.seller)) throw new FlasetError('INVALID_TERMS', 'The seller cannot be on the whitelist.');
     buyerMode = BUYER_MODE.whitelist;
     buyersRoot = tree.root;
     whitelist = tree.wallets;

@@ -3,7 +3,7 @@
 import { encodeFunctionData, erc20Abi, getAddress, type Address, type Hex, type PublicClient } from 'viem';
 import { flasetDealsAbi } from './abi.js';
 import { deploymentOf } from './deployments.js';
-import { FlashDealsError } from './errors.js';
+import { FlasetError } from '../errors.js';
 import type { SignedDeal } from './link.js';
 import { BUYER_MODE, buyerTerms, dealTypedData, type DealTerms } from './terms.js';
 import { whitelistTree } from './whitelist.js';
@@ -41,12 +41,12 @@ export interface SettleCall {
 export function buyerSide(deal: SignedDeal, buyer: Address): { terms: DealTerms; proof: Hex[] } {
   const who = getAddress(buyer);
   const { terms: offer, whitelist } = deal;
-  if (who.toLowerCase() === offer.seller.toLowerCase()) throw new FlashDealsError('NOT_A_BUYER', 'The seller cannot take its own deal.');
-  if (offer.buyerMode === BUYER_MODE.oneWallet && who.toLowerCase() !== offer.buyer.toLowerCase()) throw new FlashDealsError('NOT_A_BUYER', 'This deal is for another wallet.');
+  if (who.toLowerCase() === offer.seller.toLowerCase()) throw new FlasetError('NOT_A_BUYER', 'The seller cannot take its own deal.');
+  if (offer.buyerMode === BUYER_MODE.oneWallet && who.toLowerCase() !== offer.buyer.toLowerCase()) throw new FlasetError('NOT_A_BUYER', 'This deal is for another wallet.');
   let proof: Hex[] = [];
   if (offer.buyerMode === BUYER_MODE.whitelist) {
     const p = whitelist ? whitelistTree(whitelist).proof(who) : null;
-    if (!p) throw new FlashDealsError('NOT_A_BUYER', 'This wallet is not on the seller’s whitelist.');
+    if (!p) throw new FlasetError('NOT_A_BUYER', 'This wallet is not on the seller’s whitelist.');
     proof = p;
   }
   return { terms: buyerTerms(offer, who), proof };

@@ -1,6 +1,6 @@
 // eth_getLogs in windows the public RPCs accept, newest first, so a recent event is found in the first calls.
 import type { PublicClient } from 'viem';
-import { chainOf } from './chains.js';
+import { chainOf } from '../chains.js';
 
 export interface LogSearch {
   /** the first block to search; default the FlasetDeals deployment */

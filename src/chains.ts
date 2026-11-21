@@ -2,7 +2,7 @@
 // `flashDealsClient` (or build any viem PublicClient) to read through another provider.
 import { createPublicClient, fallback, http, type Chain, type PublicClient } from 'viem';
 import { base, bsc, mainnet, robinhood } from 'viem/chains';
-import { FlashDealsError } from './errors.js';
+import { FlasetError } from './errors.js';
 
 export interface FlashDealsChain {
   id: number;
@@ -69,12 +69,15 @@ export const CHAINS = {
 } as const satisfies Record<number, FlashDealsChain>;
 
 export type ChainId = keyof typeof CHAINS;
+
+/** Each chain's id by name: `chains.robinhood`, `chains.base`, `chains.bnbChain`, `chains.ethereum` */
+export const chains = { robinhood: 4663, base: 8453, bnbChain: 56, ethereum: 1 } as const satisfies Record<string, ChainId>;
 export const CHAIN_IDS = Object.keys(CHAINS).map(Number) as ChainId[];
 
 export const isChainId = (id: unknown): id is ChainId => typeof id === 'number' && id in CHAINS;
 
 export function chainOf(id: number): FlashDealsChain {
-  if (!isChainId(id)) throw new FlashDealsError('UNKNOWN_CHAIN', `Flash Deals runs on ${CHAIN_IDS.join(', ')}; chain ${id} is none of them.`);
+  if (!isChainId(id)) throw new FlasetError('UNKNOWN_CHAIN', `The Flaset SDK runs on ${CHAIN_IDS.join(', ')}; chain ${id} is none of them.`);
   return CHAINS[id];
 }
 

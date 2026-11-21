@@ -2,7 +2,7 @@
 // address is an exact match on Sourcify.
 import type { Address, Hex } from 'viem';
 import { ADDRESSES } from './addresses.js';
-import { chainOf, type ChainId } from './chains.js';
+import { chainOf, type ChainId } from '../chains.js';
 
 export interface DeployedContract {
   address: Address;
