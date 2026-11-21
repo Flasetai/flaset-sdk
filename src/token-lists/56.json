@@ -1,0 +1,25 @@
+{
+ "chainId": 56,
+ "native": {
+  "symbol": "BNB",
+  "name": "BNB",
+  "decimals": 18,
+  "wrapped": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
+ },
+ "tokens": [
+  {
+   "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+   "symbol": "WBNB",
+   "name": "Wrapped BNB",
+   "decimals": 18,
+   "kind": "wrapped"
+  },
+  {
+   "address": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+   "symbol": "USDC",
+   "name": "Binance-Peg USD Coin",
+   "decimals": 18,
+   "kind": "stable"
+  }
+ ]
+}
