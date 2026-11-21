@@ -12,7 +12,7 @@ builds the buy. It runs on [viem](https://viem.sh), in Node and in the browser. 
 ## Install
 
 ```sh
-npm install flash-deals-sdk viem
+npm install github:Flasetai/flash-deals-sdk viem
 ```
 
 ## Create a deal

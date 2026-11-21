@@ -47,6 +47,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "prepare": "tsup",
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
