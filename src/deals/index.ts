@@ -1,5 +1,4 @@
-// Flash Deals: a token for a payment in one atomic transaction. Create a deal, read and check it, buy it, and read the
-// buyer's vesting stream.
+// Flash Deals: create, check and buy deals, and read vesting streams.
 export * from './abi.js';
 export * from './buy.js';
 export * from './check.js';

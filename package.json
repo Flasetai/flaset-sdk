@@ -1,7 +1,7 @@
 {
   "name": "flaset-sdk",
   "version": "1.0.0",
-  "description": "The Flaset SDK: create, check and buy Flash Deals, a token for a payment in one atomic transaction, on Robinhood Chain, Base, BNB Chain and Ethereum.",
+  "description": "TypeScript SDK for Flash Deals: create, check and settle atomic OTC token deals on Robinhood Chain, Base, BNB Chain and Ethereum.",
   "license": "MIT",
   "author": "Flaset",
   "homepage": "https://flaset.ai",

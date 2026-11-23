@@ -1,6 +1,5 @@
-// End to end on a fork of Robinhood Chain: FlasetDeals as deployed, the real WETH and USDG, Sablier's real Lockup. It
-// first reads the live contract (domain, digest, fee, wiring) and then creates, checks, settles, cancels and lets
-// expire deals inside anvil. Run with `npm run test:fork` (needs Foundry's anvil).
+// E2E against a Robinhood Chain fork with the deployed contracts, real WETH/USDG and Sablier Lockup.
+// Run with `npm run test:fork` (needs anvil).
 import { erc20Abi, getAddress, keccak256, parseEther, toHex, type Address, type Hex } from 'viem';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {

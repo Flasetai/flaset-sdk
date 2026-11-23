@@ -1,5 +1,4 @@
-// Every Flash Deals contract per chain. The JSON files under deployments/ hold the same addresses with their ABIs; each
-// address is an exact match on Sourcify.
+// Contract addresses per chain (same as deployments/*.json, all exact matches on Sourcify).
 import type { Address, Hex } from 'viem';
 import { ADDRESSES } from './addresses.js';
 import { chainOf, type ChainId } from '../chains.js';

@@ -1,5 +1,4 @@
-// Create: the seller's side. Build the terms from plain inputs, then the typed data the seller signs, then (after the
-// signature) the link the buyer opens and the one transaction the seller sends: the approval of the tokens sold.
+// Seller side: build terms and typed data, then the approval for the amount sold.
 import { encodeFunctionData, erc20Abi, getAddress, type Address, type Hex } from 'viem';
 import { deploymentOf } from './deployments.js';
 import { FlasetError } from '../errors.js';
@@ -19,7 +18,7 @@ import {
 } from './terms.js';
 import { MAX_LIST, whitelistTree } from './whitelist.js';
 
-/** Who may buy: one wallet, the wallets on a list (the first to settle), or anyone (the first to settle) */
+/** One wallet, a whitelist, or anyone. Whitelist/anyone: first to settle wins. */
 export type Buyers = { wallet: Address } | { whitelist: readonly Address[] } | 'anyone';
 
 /** The vested share and how it unlocks. Durations in seconds. */
@@ -116,10 +115,7 @@ export function createDeal(input: CreateDealInput): CreatedDeal {
   return { chainId, terms, whitelist, typedData: dealTypedData(chainId, terms), digest: sellerDigest(chainId, terms) };
 }
 
-/**
- * The seller's one transaction: approve FlasetDeals for exactly the amount sold. Send it with any wallet client
- * (`walletClient.sendTransaction({ to, data })`).
- */
+/** Approves FlasetDeals for exactly the amount sold. */
 export function sellerApproval(chainId: number, terms: DealTerms): { to: Address; data: Hex } {
   return {
     to: terms.asset,

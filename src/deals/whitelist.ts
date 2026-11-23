@@ -1,8 +1,5 @@
-// The whitelist: the seller signs the Merkle root of the wallets that may buy, and the buyer settles with its proof.
-// FlasetDeals checks MerkleProof.verifyCalldata(proof, buyersRoot, leaf(buyer)) with OpenZeppelin's StandardMerkleTree
-// leaf over ["address"]: keccak256(bytes.concat(keccak256(abi.encode(a)))). The tree is built as @openzeppelin/merkle-tree
-// builds it (leaves sorted, the tree in one array, pairs hashed in sorted order), so a root made here is the root that
-// library makes for the same list.
+// Whitelist Merkle tree, compatible with @openzeppelin/merkle-tree StandardMerkleTree(["address"]).
+// Leaf: keccak256(bytes.concat(keccak256(abi.encode(a)))). Verified on chain with MerkleProof.verifyCalldata.
 import { concat, encodeAbiParameters, getAddress, keccak256, type Address, type Hex } from 'viem';
 
 /** The longest whitelist a deal link carries */

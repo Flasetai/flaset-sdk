@@ -1,5 +1,4 @@
-// Buy: the buyer's side. The buyer signs the same deal with its own address, approves exactly the price to FlasetDeals,
-// and sends `settle`. Anyone may send the settle and pay its gas; the two signatures fix every term.
+// Buyer side: sign the deal with the buyer's address, approve the price, settle.
 import { encodeFunctionData, erc20Abi, getAddress, type Address, type Hex, type PublicClient } from 'viem';
 import { flasetDealsAbi } from './abi.js';
 import { deploymentOf } from './deployments.js';
@@ -57,7 +56,7 @@ export function settleCall(chainId: number, terms: DealTerms, sellerSig: Hex, bu
   return { address: deploymentOf(chainId).FlasetDeals.address, abi: flasetDealsAbi, functionName: 'settle', args: [terms, sellerSig, buyerSig, proof] as const };
 }
 
-/** Everything a buyer needs to take a deal: the typed data to sign, the approval if one is missing, and the settle. */
+/** Typed data to sign, the approval if needed, and the settle call. */
 export async function prepareBuy(client: PublicClient, deal: SignedDeal, buyer: Address): Promise<PreparedBuy> {
   const { chainId, sellerSig } = deal;
   const deals = deploymentOf(chainId).FlasetDeals.address;
@@ -78,16 +77,13 @@ export async function prepareBuy(client: PublicClient, deal: SignedDeal, buyer: 
   };
 }
 
-/**
- * Runs the settle as an eth_call from the buyer, without sending anything: the deal's digest when it would settle, or
- * the contract's revert (Expired, BadSignature, FeeAboveMax, an ERC-20 allowance error and so on) as a thrown error.
- */
+/** Simulates `settle` from the buyer. Returns the digest, or throws the contract's revert. */
 export async function simulateBuy(client: PublicClient, prepared: PreparedBuy, buyerSig: Hex): Promise<Hex> {
   const { result } = await client.simulateContract({ account: prepared.buyer, ...prepared.settleCall(buyerSig) });
   return result;
 }
 
-/** Cancel a deal before it settles: the seller always; the buyer of a one-wallet deal too. */
+/** Cancel call. Allowed for the seller, and for the buyer of a one-wallet deal. */
 export function cancelRequest(chainId: number, offer: DealTerms): TxRequest {
   return { to: deploymentOf(chainId).FlasetDeals.address, data: encodeFunctionData({ abi: flasetDealsAbi, functionName: 'cancel', args: [offer] }) };
 }

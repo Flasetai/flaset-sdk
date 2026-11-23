@@ -1,7 +1,5 @@
-// What a token address really is, read by its address and never by its symbol, since anyone can deploy a token that
-// calls itself USDG. Each chain has a standard list (its wrapped coin, its stablecoins and, on Robinhood Chain, the Stock
-// Tokens from Robinhood's own registry), each entry from an official source and read on chain. A token at another
-// address that takes the symbol or the name of a listed one is a lookalike.
+// Token classification by address, never by symbol. Each chain has a standard list (wrapped native, stablecoins and on
+// Robinhood Chain the Stock Tokens). An unlisted token reusing a listed symbol or name is flagged as a lookalike.
 import { erc20Abi, getAddress, hexToString, type Address, type Hex, type PublicClient } from 'viem';
 import { flasetRegistryAbi } from './abi.js';
 import { deploymentOf } from './deployments.js';
@@ -40,7 +38,7 @@ export function listedToken(chainId: number, address: string): ListToken | null 
   return standardList(chainId)?.tokens.find((t) => t.address.toLowerCase() === address.toLowerCase()) ?? null;
 }
 
-/** letters and digits in one case: "U S D G", "usdg" and "USDG." are one symbol here */
+/** normalize for comparison: "U S D G", "usdg" and "USDG." all match */
 const plain = (s: string) => s.normalize('NFKC').toUpperCase().replace(/[^0-9A-Z]/g, '');
 
 /** What a token at `address` imitates: the listed token (or the chain's coin) whose symbol or name it takes at another address */
@@ -59,10 +57,7 @@ const PRECOMPILES = new Set([...Array.from({ length: 6 }, (_, i) => 0x64 + i), .
 
 export type CodeKind = { kind: 'none' } | { kind: 'delegated'; delegate: Address } | { kind: 'contract' };
 
-/**
- * The code at an address: none (no code, one byte, or a precompile), an EIP-7702 delegation (0xef0100 and a 20-byte
- * delegate: a wallet, never a token), or a contract.
- */
+/** none (no code, 1 byte, or precompile) | delegated (EIP-7702, 0xef0100 + address) | contract */
 export function codeKind(address: string, code: string | null | undefined): CodeKind {
   if (PRECOMPILES.has(BigInt(address))) return { kind: 'none' };
   const c = (code ?? '0x').toLowerCase();
@@ -94,10 +89,7 @@ const bytes32Text = (word: Hex): string | null => {
   return /^[\x20-\x7E]+$/.test(s) ? s.trim() : null;
 };
 
-/**
- * What a token address is on its chain: code at it, FlasetRegistry's block, then its own symbol (a string, or a bytes32
- * word), name and decimals. Network failures are thrown.
- */
+/** Classifies a token: code, registry block, then symbol (string or bytes32), name, decimals. Throws on RPC errors. */
 export async function checkToken(client: PublicClient, chainId: number, address: Address): Promise<TokenCheck> {
   const registry = deploymentOf(chainId).FlasetRegistry.address;
   const [code, blocked] = await Promise.all([

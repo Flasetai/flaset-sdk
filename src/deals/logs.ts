@@ -1,4 +1,4 @@
-// eth_getLogs in windows the public RPCs accept, newest first, so a recent event is found in the first calls.
+// Windowed eth_getLogs, newest block range first.
 import type { PublicClient } from 'viem';
 import { chainOf } from '../chains.js';
 
@@ -11,7 +11,7 @@ export interface LogSearch {
   window?: bigint;
 }
 
-/** Calls `get` over [from, to] in windows from the newest down, and stops at the first window that `found` accepts. */
+/** Scans [from, to] backwards in windows; stops at the first window `found` accepts. */
 export async function searchBackwards<T>(
   client: PublicClient,
   chainId: number,

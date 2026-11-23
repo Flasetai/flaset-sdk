@@ -5,7 +5,7 @@ export type FlasetErrorCode =
   | 'NOT_A_BUYER'
   | 'NOT_OPEN';
 
-/** Every error this SDK throws on purpose: `code` says which kind, `message` says it in words. */
+/** Error thrown by the SDK for invalid input or state. */
 export class FlasetError extends Error {
   readonly code: FlasetErrorCode;
   constructor(code: FlasetErrorCode, message: string) {
@@ -15,7 +15,7 @@ export class FlasetError extends Error {
   }
 }
 
-/** The same class under its earlier name */
+/** Old name of FlasetError, kept for compatibility */
 export const FlashDealsError = FlasetError;
 export type FlashDealsError = FlasetError;
 export type FlashDealsErrorCode = FlasetErrorCode;

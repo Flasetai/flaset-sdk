@@ -1,5 +1,4 @@
-// The four chains FlasetDeals runs on, with the public RPCs and explorers the Flaset app uses. Pass your own RPC URL to
-// `flashDealsClient` (or build any viem PublicClient) to read through another provider.
+// Supported chains with their default public RPCs and explorers.
 import { createPublicClient, fallback, http, type Chain, type PublicClient } from 'viem';
 import { base, bsc, mainnet, robinhood } from 'viem/chains';
 import { FlasetError } from './errors.js';
@@ -7,14 +6,14 @@ import { FlasetError } from './errors.js';
 export interface FlashDealsChain {
   id: number;
   name: string;
-  /** the viem chain, with the RPCs below as its defaults */
+  /** viem chain with `rpcUrls` as defaults */
   chain: Chain;
-  /** public RPCs, read in turn when one fails or rate-limits */
+  /** public RPCs, used as fallbacks in order */
   rpcUrls: readonly string[];
   explorer: string;
-  /** the path the Flaset app serves this chain's deals under, on https://flaset.ai */
+  /** app path for this chain's deal links */
   appPath: string;
-  /** blocks per eth_getLogs call the public RPCs accept */
+  /** max block range per eth_getLogs call */
   logWindow: bigint;
 }
 
@@ -81,9 +80,7 @@ export function chainOf(id: number): FlashDealsChain {
   return CHAINS[id];
 }
 
-/**
- * A viem PublicClient for a Flash Deals chain: through `rpcUrl` when given, else through the chain's public RPCs in turn.
- */
+/** PublicClient for a supported chain. Uses `rpcUrl` if given, else the public RPCs with fallback. */
 export function flashDealsClient(chainId: number, opts: { rpcUrl?: string } = {}): PublicClient {
   const c = chainOf(chainId);
   const transport = opts.rpcUrl ? http(opts.rpcUrl) : fallback(c.rpcUrls.map((u) => http(u)));

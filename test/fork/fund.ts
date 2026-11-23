@@ -1,5 +1,4 @@
-// Funds fork accounts with the real tokens: WETH by wrapping the account's own ETH, USDG from a large holder through
-// anvil's impersonation. Both only inside anvil.
+// Fork funding: WETH via deposit(), USDG via an impersonated holder.
 import { erc20Abi, parseEther, type Address } from 'viem';
 import type { Fork } from './anvil.js';
 

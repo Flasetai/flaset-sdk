@@ -1,4 +1,4 @@
-// Create, check and simulate a buy end to end, on a local anvil fork of Robinhood Chain (npm run example; needs Foundry).
+// Create, check and simulate a buy on a local anvil fork of Robinhood Chain. Needs Foundry.
 import { parseEther } from 'viem';
 import { chains, checkDeal, createDeal, decodeDealLink, encodeDealLink, prepareBuy, sellerApproval, simulateBuy } from 'flaset-sdk/deals';
 import { startFork } from '../test/fork/anvil.js';

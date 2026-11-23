@@ -1,6 +1,5 @@
-// The Deal both sides sign, its EIP-712 typed data and its digests, as FlasetDeals defines them. The field order and
-// types match FlasetDeals.DEAL_TYPEHASH; the domain is "FLASET Deals", version "3", on FlasetDeals' own address, so a
-// signature counts only on that contract on its own chain.
+// Deal struct, EIP-712 typed data and digests. Must match FlasetDeals.DEAL_TYPEHASH.
+// Domain: "FLASET Deals", version "3", verifyingContract = FlasetDeals.
 import { getAddress, hashTypedData, isAddress, type Address, type Hex } from 'viem';
 import { deploymentOf } from './deployments.js';
 import { FlasetError } from '../errors.js';
@@ -17,7 +16,7 @@ export const SHAPE_NAMES = Object.keys(SHAPE) as ShapeName[];
 export const MAX_STEPS = 48;
 /** FlasetDeals.BPS */
 export const BPS = 10_000;
-/** The fee FlasetDeals charges today, 0.20% of the price, from the seller's side. A governance vote can change it: read it live with `readFeeBps`. */
+/** Current fee (0.20%, paid by the seller). Can change; use `readFeeBps` for the live value. */
 export const DEFAULT_FEE_BPS = 20;
 /** The deadline of a deal without an expiry, as the Flaset app signs it */
 export const NO_DEADLINE = BigInt(Number.MAX_SAFE_INTEGER);
@@ -118,10 +117,7 @@ export function validSchedule(t: Pick<DealTerms, 'vestingShape' | 'vestingCliff'
   return false;
 }
 
-/**
- * Why FlasetDeals would refuse these terms, before any chain read (FlasetDeals._validate without the token reads), as a
- * list of sentences; empty when they are valid. Pass the offer (buyer zero for a whitelist or anyone) or the buyer's terms.
- */
+/** Offline version of FlasetDeals._validate (no token reads). Returns the problems found; empty if valid. */
 export function termsProblems(t: DealTerms): string[] {
   const out: string[] = [];
   for (const k of ['seller', 'buyer', 'asset', 'payToken'] as const) if (!isAddress(t[k], { strict: false })) out.push(`${k} is not an address.`);
@@ -147,10 +143,7 @@ export function assertTerms(t: DealTerms): DealTerms {
   return t;
 }
 
-/**
- * The Flaset app counts vesting from the settlement (vestingStart 0), except Monthly, which starts at 12:00 UTC on a day
- * from 7 days before now to 91 days after. A link with another start does not open in the app.
- */
+/** The app only accepts vestingStart 0, or for Monthly a 12:00 UTC start between -7 and +91 days from now. */
 export function appStartOk(t: Pick<DealTerms, 'vestingStart' | 'vestingShape' | 'vestingBps'>, now: number): boolean {
   if (t.vestingStart === 0n) return true;
   const s = Number(t.vestingStart);

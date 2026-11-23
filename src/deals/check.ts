@@ -1,6 +1,4 @@
-// Read and check: a signed deal's state on chain and the checks the Flaset app runs before a buyer pays. The real token
-// rather than a lookalike, no EIP-7702 delegated wallet in a token's place, the seller's signature, balance and
-// approval, the fee against the signed maxFee, the price and the vesting.
+// Deal state and pre-buy checks (tokens, signature, seller balance/allowance, fee, vesting).
 import { erc20Abi, formatUnits, getAddress, type Address, type Hash, type PublicClient } from 'viem';
 import { flasetDealsAbi } from './abi.js';
 import { deploymentOf } from './deployments.js';
@@ -21,10 +19,7 @@ export interface DealStatus {
   cancelled?: { tx: Hash; block: bigint; by: Address };
 }
 
-/**
- * A deal's state on chain: open, expired (past its deadline and never used), filled or cancelled. A used deal is looked
- * up by its digest in DealSettled and DealCancelled, from the newest block down.
- */
+/** open | expired | filled | cancelled. Used deals are found by digest in DealSettled/DealCancelled, newest first. */
 export async function dealState(client: PublicClient, chainId: number, terms: DealTerms, opts: { now?: number; logs?: LogSearch } = {}): Promise<DealStatus> {
   const { FlasetDeals } = deploymentOf(chainId);
   const digest = sellerDigest(chainId, terms);
@@ -107,7 +102,7 @@ const days = (s: bigint) => {
   return Number.isInteger(d) ? `${d} ${d === 1 ? 'day' : 'days'}` : `${Number(s).toLocaleString('en-US')} seconds`;
 };
 
-/** The vesting in words, from the signed fields only */
+/** Human-readable vesting summary */
 export function describeVesting(t: DealTerms): VestingSummary | null {
   if (t.vestingBps === 0) return null;
   const shape = SHAPE_NAMES[t.vestingShape] ?? 'linear';
@@ -156,10 +151,7 @@ function tokenCheck(id: string, role: string, t: TokenCheck): Check {
   }
 }
 
-/**
- * The deal's state and every check the Flaset app runs before a buyer pays. Pass `buyer` to check that wallet may take
- * the deal and holds the price, and to learn the approval it still needs.
- */
+/** State plus all pre-buy checks. With `buyer`, also checks eligibility, balance and the missing approval. */
 export async function checkDeal(client: PublicClient, deal: SignedDeal, opts: { buyer?: Address; now?: number; logs?: LogSearch } = {}): Promise<DealCheck> {
   const { chainId, terms, sellerSig, whitelist } = deal;
   const { FlasetDeals } = deploymentOf(chainId);

@@ -1,6 +1,4 @@
-// Starts anvil on a fork of a live chain for the fork tests and the example. Nothing reaches the live chain: every
-// transaction runs inside anvil. FORK_URL picks the upstream RPC (default: the chain's public RPC); ANVIL picks the
-// binary (default: anvil on PATH, from Foundry).
+// Starts a local anvil fork. Env: FORK_URL (upstream RPC, default the chain's public RPC), ANVIL (binary path).
 import { spawn, type ChildProcess } from 'node:child_process';
 import { createServer } from 'node:net';
 import { createPublicClient, createTestClient, createWalletClient, getAddress, http, type Address, type PublicClient } from 'viem';

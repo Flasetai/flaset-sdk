@@ -1,6 +1,5 @@
-// Writes src/deals/abi.ts and src/deals/addresses.ts from deployments/<chain>.json: viem infers every call's types from
-// the deployed ABIs, and the package carries each ABI once.
-// Every chain runs the same build, so the script stops when one chain's ABI differs from another's.
+// Generates src/deals/abi.ts and src/deals/addresses.ts from deployments/*.json.
+// Fails if the ABIs differ between chains (all chains run the same build).
 // Usage: node scripts/gen-abi.mjs [--check]
 import { readFileSync, writeFileSync } from 'node:fs';
 

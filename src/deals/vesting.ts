@@ -1,6 +1,4 @@
-// Vesting: the vested share of a deal is one Sablier Lockup stream, minted to the buyer as an NFT, that nobody can
-// cancel. A buyer's streams are found through FlasetDeals' DealSettled events (the buyer is indexed); each is then read
-// on the Lockup itself.
+// Vesting streams (Sablier Lockup, non-cancelable). Found via DealSettled (buyer is indexed), then read from Lockup.
 import { parseEventLogs, type Address, type Hash, type PublicClient, type TransactionReceipt } from 'viem';
 import { flasetDealsAbi, sablierLockupAbi } from './abi.js';
 import { deploymentOf } from './deployments.js';

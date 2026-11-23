@@ -1,7 +1,6 @@
-// The deal link, exactly as the Flaset app builds and opens it: `<origin><appPath>/deal/open#d=<deal>&l=<list>`. The deal
-// is base64url JSON `{ v: 3, chainId, contract, terms, sellerSig }`, the terms with uint256 fields as decimal strings and
-// the uint64 fields as numbers; a whitelist travels as each wallet's 20 bytes in base64url. Only the fragment carries the
-// deal, so it never reaches a server.
+// Deal links: `<origin><appPath>/deal/open#d=<deal>&l=<list>`, same format as the app.
+// d = base64url JSON { v: 3, chainId, contract, terms, sellerSig } (uint256 as decimal strings, uint64 as numbers).
+// l = concatenated 20-byte addresses, base64url. Data lives in the fragment, so it is never sent to a server.
 import { getAddress, isAddress, type Address, type Hex } from 'viem';
 import { chainOf, isChainId } from '../chains.js';
 import { deploymentOf } from './deployments.js';
@@ -136,10 +135,7 @@ export function encodeDealLink(deal: SignedDeal, opts: { origin?: string } = {})
   return `${origin}${chainOf(chainId).appPath}/deal/open#d=${toB64url(JSON.stringify(payload))}${list}`;
 }
 
-/**
- * The signed deal in a link, read as the Flaset app's buyer page reads it: a whole link, its fragment, or the `d` value
- * alone. Throws a FlasetError (code INVALID_LINK) with the app's reason when the app would not open it.
- */
+/** Parses a full link, a fragment, or a bare `d` value. Throws INVALID_LINK when the app would reject it. */
 export function decodeDealLink(link: string, opts: { now?: number } = {}): SignedDeal {
   const now = opts.now ?? Math.floor(Date.now() / 1000);
   const text = link.trim();
